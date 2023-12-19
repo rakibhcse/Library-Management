@@ -1,0 +1,174 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+//Book record Structure
+typedef struct
+{
+    int bookID;
+    char title[100];
+    char author[100];
+    int shelf;
+    struct node*next;
+} Book;
+//Structure for linked list
+typedef struct node
+{
+    Book book;
+    struct node*next;
+} node;
+node*head=NULL;
+//Function to create a new node
+node*createnode(Book book)
+{
+    node*newnode=(node*)malloc(sizeof(node));
+    newnode->book=book;
+    newnode->next=NULL;
+    return newnode;
+}
+//Function to add a book
+void addBook(Book book)
+{
+    node*newnode=createnode(book);
+    if(head==NULL)
+    {
+        head=newnode;
+    }
+    else
+    {
+        node*temp=head;
+        while(temp->next!=NULL)
+        {
+            temp=temp->next;
+        }
+        temp->next=newnode;
+    }
+    printf("Book added to the library successfully.\n");
+}
+//Function to remove a book
+void removeBook(int bookID)
+{
+    if(head==NULL)
+    {
+        printf("There is no book.\n");
+        return;
+    }
+    if (head->book.bookID==bookID)
+    {
+        node*temp=head;
+        head=head->next;
+        free(temp);
+        printf("Book from the list removed successfully.\n");
+        return;
+    }
+    node*temp=head;
+    while(temp->next!=NULL&&temp->next->book.bookID!=bookID)
+    {
+        temp=temp->next;
+    }
+    if(temp->next==NULL)
+    {
+        printf("Book ID %d not found.\n",bookID);
+        return;
+    }
+    node*toDelete=temp->next;
+    temp->next=toDelete->next;
+    free(toDelete);
+    printf("Book removed from the list successfully.\n");
+}
+//Function to search a book
+void searchBook(const char*keyword)
+{
+    node*temp=head;
+    int found=0;
+    while(temp!=NULL)
+    {
+        if(strcmp(temp->book.title,keyword)==0||strcmp(temp->book.author,keyword)==0)
+        {
+            printf("Book ID: %d\nTitle: %s\nAuthor: %s\nShelf number: %d\n",temp->book.bookID,temp->book.title,temp->book.author,temp->book.shelf);
+            found =1;
+        }
+        temp=temp->next;
+    }
+    if(!found)
+    {
+        printf("No book found from the given keyword\n");
+    }
+}
+//function to display book list
+void displayBooks()
+{
+    node*temp=head;
+    if(temp==NULL)
+    {
+        printf("There is no book in the library.\n");
+        return;
+    }
+    printf("Book ID\tTitle\tAuthor\tShelf number\n");
+    while(temp!=NULL)
+    {
+        printf("%d\t%s\t%s\t%d\n",temp->book.bookID,temp->book.title,temp->book.author,temp->book.shelf);
+        temp=temp->next;
+    }
+}
+int main()
+{
+    int choice,bookID,shelf;
+    Book book;
+    char keyword[100];
+
+    do
+    {
+        printf("\n    Library Management\n");
+        printf("---------------------------\n");
+        printf("1. Add Book\n");
+        printf("2. Remove Book\n");
+        printf("3. Search Book\n");
+        printf("4. Display Book\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d",&choice);
+
+        switch(choice)
+        {
+        case 1:
+            printf("Enter book Id: ");
+            scanf("%d",&book.bookID);
+            printf("Enter book title: ");
+            scanf(" %[^\n]s",book.title);
+            printf("Enter book Author name: ");
+            scanf(" %[^\n]s",book.author);
+            printf("Enter shelf number: ");
+            scanf(" %d",&book.shelf);
+            addBook(book);
+            break;
+        case 2:
+            printf("Enter the book ID you wish to remove: ");
+            scanf("%d",&bookID);
+            removeBook(bookID);
+            break;
+        case 3:
+            printf("Enter a keyword to search for book: ");
+            scanf(" %[^\n]s",keyword);
+            searchBook(keyword);
+            break;
+        case 4:
+            displayBooks();
+            break;
+        case 5:
+            printf("Exiting program.\n");
+            break;
+        default:
+            printf("Invalid choice. Please try again.\n");
+        }
+    }
+    //Free memory
+    while(choice!=5);
+    node*current=head;
+    while(current!=NULL)
+    {
+        node*temp=current;
+        current=current->next;
+        free(temp);
+    }
+    return 0;
+}
